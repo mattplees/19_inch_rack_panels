@@ -77,6 +77,7 @@ module create_panel_joiners_m4(num_panels) {
       panel_joiner_m4_nut();
   }
 }
+
 module panel_joiner_test_cage() {
   difference() {
     panel_joiner_cage_nut();
@@ -85,9 +86,25 @@ module panel_joiner_test_cage() {
   }
 }
 
+module panel_joiner_test_m4_nut() {
+  difference() {
+    panel_joiner_m4_nut();
+    translate([-5,-3.5,+12.5])
+      cube([panel_width+10,10,1u_height]);
+  }
+}
+
 module panel_joiner_test_m6() {
   difference() {
     panel_joiner_m6();
+    translate([-5,-3.5,+12.5])
+      cube([panel_width+10,10,1u_height]);
+  }
+}
+
+module panel_joiner_test_m4() {
+  difference() {
+    panel_joiner_m4();
     translate([-5,-3.5,+12.5])
       cube([panel_width+10,10,1u_height]);
   }
@@ -148,14 +165,20 @@ translate([0,0,-4*1u_height]) {
 translate([0,0,+4*1u_height])
   vertical_test();
 
-translate([50,0,+4*1u_height])
+translate([70,0,+4*1u_height])
   panel_joiner_test_m6();
 
-translate([50,0,+4.5*1u_height])
+translate([70,0,+4.5*1u_height])
   panel_joiner_test_cage();
 
-translate([100,0,+4*1u_height])
+translate([30,0,+4*1u_height])
+  panel_joiner_test_m4();
+
+translate([30,0,+4.5*1u_height])
+  panel_joiner_test_m4_nut();
+
+translate([110,0,+4*1u_height])
   horizontal_test(4);
 
-translate([100,0,+4.5*1u_height])
+translate([110,0,+4.5*1u_height])
   horizontal_test(3);

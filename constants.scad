@@ -1,7 +1,7 @@
 $fn = 100;
 
 // 
-panel_thickness = 1.5;
+panel_thickness = 2;
 rack_mount_width = 15.875;
 rack_bolt_dia = 6.6;
 join_bolt_dia = 4.6;
