@@ -66,6 +66,17 @@ module create_panel_joiners(num_panels) {
   }
 }
 
+module create_panel_joiners_m4(num_panels) {
+  panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
+
+  for (i = [1:num_panels-1]) {
+    translate([(panel_width*i)-(rack_mount_width)+1.5,-10,0])
+      panel_joiner_m4();
+
+    translate([(panel_width*i)-(rack_mount_width)+1.5,+10,0])
+      panel_joiner_m4_nut();
+  }
+}
 module panel_joiner_test_cage() {
   difference() {
     panel_joiner_cage_nut();
@@ -114,13 +125,13 @@ module horizontal_test(num_panels) {
 
 translate([0,0,1.5*1u_height]) {
   create_full_2u_panel(4);
-  create_panel_joiners(4);
+  create_panel_joiners_m4(4);
   translate([0,0,1u_height])
-    create_panel_joiners(4);
+    create_panel_joiners_m4(4);
 }
 
 create_full_1u_panel(4);
-create_panel_joiners(4);
+create_panel_joiners_m4(4);
 
 translate([0,0,-1.5*1u_height]) {
   create_full_1u_panel(3);

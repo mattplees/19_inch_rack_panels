@@ -4,6 +4,11 @@ $fn = 100;
 panel_thickness = 1.5;
 rack_mount_width = 15.875;
 rack_bolt_dia = 6.6;
+join_bolt_dia = 4.6;
+nut_trap_height = 3;
+nut_trap_holder = 9;
+nut_trap_size = 5.7;
+cage_nut_hole = 9.5;
 
 //
 1u_height = 44.4;

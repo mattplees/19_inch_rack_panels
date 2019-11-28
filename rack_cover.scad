@@ -1,5 +1,14 @@
 include <constants.scad>;
-use <triangles.scad>;
+use <nuttrap.scad>;
+
+module cylinder_oval(x, y, z, offset) {
+  hull() {
+    translate([x-(offset/2),y,z])
+      cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+    translate([x+(offset/2),y,z])
+      cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+  }
+}
 
 module create_1u_panel(num_panels) {
   panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
@@ -11,17 +20,13 @@ module create_1u_panel(num_panels) {
           translate([0, -1u_height, 0])
             cube([panel_width, 1u_height, panel_thickness]);
         
-          translate([horz_spacing,-top_spacing,0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
-          translate([horz_spacing,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
-          translate([horz_spacing,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
-          
-          translate([panel_width-horz_spacing,-top_spacing,0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
-          translate([panel_width-horz_spacing,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+          cylinder_oval(horz_spacing, -top_spacing, 0, 2.5);
+          cylinder_oval(horz_spacing, -(top_spacing+hole_spacing), 0, 2.5);
+          cylinder_oval(horz_spacing, -(top_spacing+2*hole_spacing), 0, 2.5);
+          cylinder_oval(panel_width-horz_spacing,-top_spacing, 0, 2.5);
+          cylinder_oval(panel_width-horz_spacing,-(top_spacing+hole_spacing), 0, 2.5);
+          cylinder_oval(panel_width-horz_spacing,-(top_spacing+2*hole_spacing), 0, 2.5);
+
           translate([panel_width-horz_spacing,-(top_spacing+2*hole_spacing),0])
             cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
         }
@@ -41,7 +46,7 @@ module triangle(o_len, a_len, depth, center=false) {
     centroid = center ? [-a_len/3, -o_len/3, -depth/2] : [0, 0, 0];
     translate(centroid) linear_extrude(height=depth)
     {
-        polygon(points=[[0,0],[a_len,0],[0,o_len]], paths=[[0,1,2]]);
+      polygon(points=[[0,0],[a_len,0],[0,o_len]], paths=[[0,1,2]]);
     }
 }
 
@@ -70,7 +75,6 @@ module add_pi3() {
         import("Raspberry_Pi_3_Light_Version.STL");
 }
 
-
 module panel_joiner() {
   left_reduce = 1.5;
   right_reduce = 1.5;
@@ -79,6 +83,51 @@ module panel_joiner() {
   translate([0, -1u_height, 0])
     cube([joiner_width, 1u_height, panel_thickness]);
 }
+
+module panel_joiner_m4() {
+  left_reduce = 1.5;
+  right_reduce = 1.5;
+  joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
+  
+  translate([0, panel_thickness, 0]) {
+    rotate([90,0,0]) {
+      translate([0, 1u_height, 0]) {
+        difference() {
+          union() {
+            panel_joiner();
+            translate([horz_spacing-left_reduce,-top_spacing,0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+            translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+            translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+
+            translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+            translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+            translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
+              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+          }
+          translate([horz_spacing-left_reduce,-top_spacing,0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+          translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+          translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+
+          translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+          translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+          translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
+            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+        }
+      }
+    }
+  }
+}
+
 
 module panel_joiner_m6() {
   left_reduce = 1.5;
@@ -90,7 +139,7 @@ module panel_joiner_m6() {
       translate([0, 1u_height, 0]) {
         difference() {
           panel_joiner();
-          
+
           translate([horz_spacing-left_reduce,-top_spacing,0])
             cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
@@ -99,11 +148,11 @@ module panel_joiner_m6() {
             cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
 
           translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
         }
       }
     }
@@ -139,6 +188,68 @@ module panel_joiner_cage_nut() {
       }
     }
   }
+}
+module panel_joiner_m4_nut() {
+  left_reduce = 1.5;
+  right_reduce = 1.5;
+  joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
+  
+  translate([0,panel_thickness,0])
+    mirror([0,1,0])
+      translate([0, panel_thickness, 0]) {
+        rotate([90,0,0]) {
+          translate([0, 1u_height, 0]) {
+            difference() {
+              union() {
+                panel_joiner();            
+                translate([horz_spacing-left_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+
+                translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+              }
+              
+              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
+                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+            }
+          }
+        }
+      }
 }
 
 module fangrill(fansize, gap, cutout) {
@@ -181,8 +292,10 @@ module grill(width, height, gap, cutout) {
   rotate([90,0,0]) {
     for (i = [0:(width/gap)]) {
       hull() {
-        translate([-(width/2)+(cutout/2)+(i*gap),-(height/2)+cutout,0]) cylinder(h=panel_thickness*3, d=cutout, center=true);
-        translate([-(width/2)+(cutout/2)+(i*gap),+(height/2)-cutout,0]) cylinder(h=panel_thickness*3, d=cutout, center=true);
+        translate([-(width/2)+(cutout/2)+(i*gap),-(height/2)+cutout,0]) 
+          cylinder(h=panel_thickness*3, d=cutout, center=true);
+        translate([-(width/2)+(cutout/2)+(i*gap),+(height/2)-cutout,0]) 
+          cylinder(h=panel_thickness*3, d=cutout, center=true);
       }
     }
   }
@@ -195,5 +308,7 @@ module grill(width, height, gap, cutout) {
 //create_1u_panel(4);
 //create_2u_panel(4);
 //create_tray(4);
+//panel_joiner_m4();
+//panel_joiner_m4_nut();
 //panel_joiner_m6();
 //panel_joiner_cage_nut();
