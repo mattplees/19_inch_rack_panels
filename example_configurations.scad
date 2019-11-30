@@ -1,4 +1,4 @@
-use <rack_cover.scad>;
+use <rack_panel.scad>;
 include <constants.scad>;
 
 module create_full_1u_panel(num_panels) {
