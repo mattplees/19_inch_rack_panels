@@ -2,7 +2,7 @@ include <constants.scad>;
 use <nuttrap.scad>;
 
 module cylinder_oval(x, y, z, offset) {
-  hull() {
+  color("blue") hull() {
     translate([x-(offset/2),y,z])
       cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
     translate([x+(offset/2),y,z])
@@ -54,6 +54,11 @@ module create_tray_joiner(nuttrap) {
  
   difference() {
     union() {
+      // Strenghlening support
+      translate([rack_mount_width,0,0])
+        rotate([180,180,0])
+          triangle(rack_mount_width, rack_mount_width, panel_thickness);
+   
       // horizontal from tray
       cube([rack_mount_width, rack_mount_width, panel_thickness]);
       // Vertical join
@@ -65,6 +70,7 @@ module create_tray_joiner(nuttrap) {
         rotate([90,0,0])
           triangle(rack_mount_width, rack_mount_width-tray_join_width+panel_thickness, panel_thickness);
     }
+    
     if (nuttrap == false) {
       translate([0,rack_mount_width/2,panel_thickness+(rack_mount_width/2)])
         rotate([0,90,0]) 
@@ -104,7 +110,6 @@ module create_tray(num_panels) {
         }
       }
     }
-
 }
 
 module add_pi3() {
@@ -115,18 +120,82 @@ module add_pi3() {
 }
 
 module panel_joiner() {
-  left_reduce = 1.5;
-  right_reduce = 1.5;
+  left_reduce = 2;
+  right_reduce = 2;
   joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
   
   translate([0, -1u_height, 0])
     cube([joiner_width, 1u_height, panel_thickness]);
 }
 
+module panel_joiner_m4_nut() {
+  left_reduce = 1.5;
+  right_reduce = 1.5;
+  joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
+  
+  translate([0,panel_thickness,0])
+    mirror([0,1,0])
+      translate([0, panel_thickness, 0]) {
+        rotate([90,0,0]) {
+          translate([0, 1u_height, 0]) {
+            difference() {
+              union() {
+                panel_joiner();            
+                translate([horz_spacing-left_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+
+                translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
+                  color("red") cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
+              }
+              
+              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
+                color("DeepSkyBlue") cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
+              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
+                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+            }
+          }
+        }
+      }
+}
+
 module panel_joiner_m4() {
   left_reduce = 1.5;
   right_reduce = 1.5;
   joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
+  tolerance = 0.5;
   
   translate([0, panel_thickness, 0]) {
     rotate([90,0,0]) {
@@ -135,38 +204,38 @@ module panel_joiner_m4() {
           union() {
             panel_joiner();
             translate([horz_spacing-left_reduce,-top_spacing,0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
             translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
             translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
 
             translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
             translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
             translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
-              cylinder(h=panel_thickness*2, d=rack_bolt_dia, center=true);
+              color("red") cylinder(h=panel_thickness*2, d=rack_bolt_dia-tolerance, center=true);
           }
+          
           translate([horz_spacing-left_reduce,-top_spacing,0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
 
           translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
+            color("DeepSkyBlue") cylinder(h=panel_thickness*10, d=join_bolt_dia, center=true);
         }
       }
     }
   }
 }
-
 
 module panel_joiner_m6() {
   left_reduce = 1.5;
@@ -180,18 +249,18 @@ module panel_joiner_m6() {
           panel_joiner();
 
           translate([horz_spacing-left_reduce,-top_spacing,0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*3, d=rack_bolt_dia, center=true);
 
           translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
-            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
-            cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
+            color("DarkOrange") cylinder(h=panel_thickness*10, d=rack_bolt_dia, center=true);
         }
       }
     }
@@ -211,84 +280,22 @@ module panel_joiner_cage_nut() {
           panel_joiner();
           
           translate([horz_spacing-left_reduce,-top_spacing,0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
           translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
 
           translate([joiner_width-horz_spacing+right_reduce,-top_spacing,0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
           translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),0])
-            cube(size = cage_nut_hole, center=true);
+            color("DarkOrange") cube(size = cage_nut_hole, center=true);
         }
       }
     }
   }
-}
-module panel_joiner_m4_nut() {
-  left_reduce = 1.5;
-  right_reduce = 1.5;
-  joiner_width = (rack_mount_width * 2) - left_reduce - right_reduce;
-  
-  translate([0,panel_thickness,0])
-    mirror([0,1,0])
-      translate([0, panel_thickness, 0]) {
-        rotate([90,0,0]) {
-          translate([0, 1u_height, 0]) {
-            difference() {
-              union() {
-                panel_joiner();            
-                translate([horz_spacing-left_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-                translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-                translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-
-                translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-                translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness+(nut_trap_height/2)])
-                  cube([nut_trap_holder,nut_trap_holder,nut_trap_height], center=true);
-              }
-              
-              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([horz_spacing-left_reduce,-top_spacing,panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-
-              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([horz_spacing-left_reduce,-(top_spacing+hole_spacing),panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-
-              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([horz_spacing-left_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-
-              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([joiner_width-horz_spacing+right_reduce,-top_spacing,panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-
-              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+hole_spacing),panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-
-              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness/2])
-                cylinder(h=panel_thickness*2, d=join_bolt_dia, center=true);
-              translate([joiner_width-horz_spacing+right_reduce,-(top_spacing+2*hole_spacing),panel_thickness])
-                color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
-            }
-          }
-        }
-      }
 }
 
 module fangrill(fansize, gap, cutout) {
@@ -344,9 +351,9 @@ module grill(width, height, gap, cutout) {
 //grill(90, 35, 6, 3);
 //fangrill(80, 7, 3);
 //fangrill(40, 4, 2);
-create_1u_panel(4);
+//create_1u_panel(4);
 //create_2u_panel(4);
-create_tray(4);
+//create_tray(4);
 translate([-175,0,0]){
   create_1u_panel(3);
   create_tray(3);
@@ -356,6 +363,13 @@ translate([-175,0,0]){
 //translate([0,-20,0]) create_tray_joiner(false);
 
 //panel_joiner_m4();
-//panel_joiner_m4_nut();
+//translate([40, 0, 0]) panel_joiner_m4_nut();
 //panel_joiner_m6();
-//panel_joiner_cage_nut();
+//translate([40, 0, 0]) panel_joiner_cage_nut();
+
+
+
+
+
+
+

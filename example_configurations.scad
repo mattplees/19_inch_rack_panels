@@ -110,21 +110,6 @@ module panel_joiner_test_m4() {
   }
 }
 
-module vertical_test() {
-  panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
-
-  difference() {
-    union() {
-      create_1u_panel(4);
-      create_tray(4);
-    }
-    translate([rack_mount_width+2*panel_thickness,-3.5,-5])
-      cube([panel_width,120,1u_height*3]);
-    translate([0,10,-5])
-      cube([panel_width,120,1u_height*3]);
-  }
-}
-
 module horizontal_test(num_panels) {
   panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
 
@@ -137,6 +122,21 @@ module horizontal_test(num_panels) {
       cube([panel_width+10,20,1u_height]);
     translate([-5,3,-5])
       cube([panel_width+10,110,1u_height+10]);
+  }
+}
+
+module vertical_test() {
+  panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
+
+  difference() {
+    union() {
+      create_1u_panel(4);
+      create_tray(4);
+    }
+    translate([rack_mount_width+2*panel_thickness,-3.5,-5])
+      cube([panel_width,120,1u_height*3]);
+    translate([-10,10,-5])
+      cube([panel_width+20,120,1u_height*3]);
   }
 }
 
@@ -162,9 +162,6 @@ translate([0,0,-4*1u_height]) {
     create_panel_joiners(3);
 }
 
-translate([0,0,+4*1u_height])
-  vertical_test();
-
 translate([70,0,+4*1u_height])
   panel_joiner_test_m6();
 
@@ -182,3 +179,8 @@ translate([110,0,+4*1u_height])
 
 translate([110,0,+4.5*1u_height])
   horizontal_test(3);
+
+translate([0,0,+4*1u_height])
+  vertical_test();
+
+
