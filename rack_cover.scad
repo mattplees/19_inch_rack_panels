@@ -50,22 +50,61 @@ module triangle(o_len, a_len, depth, center=false) {
     }
 }
 
-module create_tray(num_panels) {
-  support_tray_depth = 100;
-  panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
-  panel_width_internal = panel_width - rack_mount_width - rack_mount_width;
-
-  translate([rack_mount_width,panel_thickness,0]) {
+module create_tray_joiner(nuttrap) {  
+ 
+  difference() {
     union() {
-      cube([panel_width_internal, support_tray_depth, panel_thickness]);
-      translate([panel_thickness,0,0])
-        rotate([0,-90,0])
-          triangle(support_tray_depth, 1u_height, panel_thickness);
-      translate([panel_width_internal,0,0])
-        rotate([0,-90,0])
-          triangle(support_tray_depth, 1u_height, panel_thickness);
+      // horizontal from tray
+      cube([rack_mount_width, rack_mount_width, panel_thickness]);
+      // Vertical join
+      cube([tray_join_width, rack_mount_width, rack_mount_width+panel_thickness]);
+      translate([tray_join_width,panel_thickness,panel_thickness])
+        rotate([90,0,0])
+          triangle(rack_mount_width, rack_mount_width-tray_join_width+panel_thickness, panel_thickness);
+      translate([tray_join_width,rack_mount_width,panel_thickness])
+        rotate([90,0,0])
+          triangle(rack_mount_width, rack_mount_width-tray_join_width+panel_thickness, panel_thickness);
+    }
+    if (nuttrap == false) {
+      translate([0,rack_mount_width/2,panel_thickness+(rack_mount_width/2)])
+        rotate([0,90,0]) 
+          color("blue") cylinder(h=rack_mount_width*2, d=join_bolt_dia, center=true);
+    }
+    else {
+      translate([tray_join_width-nut_trap_height,rack_mount_width/2,panel_thickness+(rack_mount_width/2)])
+        rotate([0,90,0])
+          color("purple") nut_trap(nut_trap_size, h=nut_trap_height*2);
+      translate([0,rack_mount_width/2,panel_thickness+(rack_mount_width/2)])
+        rotate([0,90,0])
+          color("blue") cylinder(h=rack_mount_width*2, d=join_bolt_dia, center=true);
     }
   }
+}
+
+module create_tray(num_panels) {
+  panel_width = ((nineteen_inches_metric - (num_panels - 1)) / num_panels);
+  panel_width_internal = panel_width - rack_mount_width - rack_mount_width;
+  
+  union() {
+    translate([rack_mount_width,panel_thickness,0]) {
+        cube([panel_width_internal, support_tray_depth, panel_thickness]);
+        translate([panel_thickness,0,0])
+          rotate([0,-90,0])
+            triangle(support_tray_depth, 1u_height, panel_thickness);
+        translate([panel_width_internal,0,0])
+          rotate([0,-90,0])
+            triangle(support_tray_depth, 1u_height, panel_thickness);
+      }
+      translate([0,support_tray_depth-rack_mount_width+panel_thickness,0]) {
+        create_tray_joiner(true);
+      }
+      translate([panel_width,support_tray_depth-rack_mount_width+panel_thickness,0]) {
+        mirror([180,0,0]) {
+          create_tray_joiner(false);
+        }
+      }
+    }
+
 }
 
 module add_pi3() {
@@ -305,9 +344,17 @@ module grill(width, height, gap, cutout) {
 //grill(90, 35, 6, 3);
 //fangrill(80, 7, 3);
 //fangrill(40, 4, 2);
-//create_1u_panel(4);
+create_1u_panel(4);
 //create_2u_panel(4);
-//create_tray(4);
+create_tray(4);
+translate([-175,0,0]){
+  create_1u_panel(3);
+  create_tray(3);
+}
+
+//create_tray_joiner(true);
+//translate([0,-20,0]) create_tray_joiner(false);
+
 //panel_joiner_m4();
 //panel_joiner_m4_nut();
 //panel_joiner_m6();

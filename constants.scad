@@ -9,6 +9,8 @@ nut_trap_height = 3;
 nut_trap_holder = 9;
 nut_trap_size = 5.7;
 cage_nut_hole = 9.5;
+tray_join_width = 5;
+support_tray_depth = 100;
 
 //
 1u_height = 44.4;
